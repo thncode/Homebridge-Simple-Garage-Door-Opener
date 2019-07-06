@@ -1,6 +1,6 @@
 {
-  "name": "homebridge-garage-door-opener",
-  "version": "1.0.1",
+  "name": "homebridge-barrier-gate-opener",
+  "version": "1.0.0",
   "description": "Garage Door Opener plugin for Homebridge with auto-states",
   "author": "Thomas Nemec",
   "license": "MIT",
