@@ -1,8 +1,10 @@
 'use strict';
 
 const rpio = require('rpio');
+const fs = require('fs');
 
 var Service, Characteristic;
+var script;
 
 module.exports = (homebridge) => {
   Service = homebridge.hap.Service;
@@ -16,7 +18,7 @@ class SimpleGarageDoorOpener {
 
     //get config values
     this.name = config['name'];
-    this.doorSwitchPin = config['doorSwitchPin'] || 17;
+    this.doorSwitchPin = config['doorSwitchPin'] || 12;					// PIN 12 = GPIO18
     this.simulateTimeOpening = config['simulateTimeOpening'] || 15;
     this.simulateTimeOpen = config['simulateTimeOpen'] || 30;
     this.simulateTimeClosing = config['simulateTimeClosing'] || 15;
@@ -39,7 +41,28 @@ class SimpleGarageDoorOpener {
   }
 
   setupGarageDoorOpenerService (service) {
-    //rpio.open(this.doorSwitchPin, rpio.OUTPUT, rpio.LOW);
+  
+  	//rpio.open(this.doorSwitchPin, rpio.OUTPUT, rpio.LOW);
+  	
+  	if (fs.existsSync('/sys/class/gpio/export')) {
+ 		 this.log('GPIO export 18 done');
+	}
+	else {
+	
+		const exec = require('child_process').exec;
+		script = exec('echo "18" > /sys/class/gpio/export',
+			(error, stdout, stderr) => {
+				if (error !== null) {
+					this.log("exec error: ", error);
+				}
+			});	
+		script = exec('echo "out" > /sys/class/gpio/gpio18/direction',
+			(error, stdout, stderr) => {
+				if (error !== null) {
+					this.log("exec error: ", error);
+				}
+			});
+	}
 
     this.service.setCharacteristic(Characteristic.TargetDoorState, Characteristic.TargetDoorState.CLOSED);
     this.service.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSED);
@@ -73,9 +96,24 @@ class SimpleGarageDoorOpener {
   }
 
   openGarageDoor (callback) {
-    rpio.write(this.doorSwitchPin, rpio.HIGH);
-    rpio.sleep(0.5);
-    rpio.write(this.doorSwitchPin, rpio.LOW);
+//    rpio.write(this.doorSwitchPin, rpio.HIGH);
+//    rpio.sleep(0.5);
+//    rpio.write(this.doorSwitchPin, rpio.LOW);
+
+	const exec = require('child_process').exec;
+	script = exec('echo "1" > /sys/class/gpio/gpio18/value',
+		(error, stdout, stderr) => {
+			if (error !== null) {
+				this.log("exec error: ", error);
+			}
+		});	
+
+	script = exec('echo "0" > /sys/class/gpio/gpio18/value',
+		(error, stdout, stderr) => {
+			if (error !== null) {
+				this.log("exec error: ", error);
+			}
+		});	
 
     this.log('Öffne die Schranke...');
     this.simulateGarageDoorOpening();
