@@ -44,10 +44,10 @@ class SimpleGarageDoorOpener {
   
   	//rpio.open(this.doorSwitchPin, rpio.OUTPUT, rpio.LOW);
   	
-  	//if (fs.existsSync('/sys/class/gpio/export')) {
- 	//	 this.log('GPIO export 18 done');
-	//}
-	//else {
+  	if (fs.existsSync('/sys/class/gpio/gpio18')) {
+ 		 this.log('GPIO export 18 done');
+	}
+	else {
 	
 		const exec = require('child_process').exec;
 		script = exec('echo "18" > /sys/class/gpio/export',
@@ -62,7 +62,7 @@ class SimpleGarageDoorOpener {
 					this.log("exec error: ", error);
 				}
 			});
-	//}
+	}
 
     this.service.setCharacteristic(Characteristic.TargetDoorState, Characteristic.TargetDoorState.CLOSED);
     this.service.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSED);
